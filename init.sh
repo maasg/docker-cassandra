@@ -12,11 +12,21 @@ echo "Found seeds: "$SEEDS
 
 # Setup Cassandra
 CONFIG=/etc/cassandra/
-sed -i -e "s/^listen_address.*/listen_address: $IP/"            $CONFIG/cassandra.yaml
-sed -i -e "s/^rpc_address.*/rpc_address: 0.0.0.0/"              $CONFIG/cassandra.yaml
-sed -i -e "s/- seeds: \"127.0.0.1\"/- seeds: \"$SEEDS\"/"       $CONFIG/cassandra.yaml
-sed -i -e "s/# JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname=<public name>\"/ JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname=$IP\"/" $CONFIG/cassandra-env.sh
+#sed -i -e "s/^listen_address.*/listen_address: $IP/"            $CONFIG/cassandra.yaml
+#sed -i -e "s/^rpc_address.*/rpc_address: 0.0.0.0/"              $CONFIG/cassandra.yaml
+#sed -i -e "s/- seeds: \"127.0.0.1\"/- seeds: \"$SEEDS\"/"       $CONFIG/cassandra.yaml
+#sed -i -e "s/# JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname=<public name>\"/ JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname=$IP\"/" $CONFIG/cassandra-env.sh
 
-# Start Cassandra
-echo Starting Cassandra...
-cassandra -f -p /var/run/cassandra.pid
+# Setup DSE
+
+sed -i -e "s/^SPARK_ENABLED=0/SPARK_ENABLED=0/"  /etc/default/dse
+
+# Start Datastax Enterprise
+echo Starting DSE ...
+
+sudo service dse start
+
+echo Starting Spark Notebook
+cd /opt/spark-notebook/
+cd `find . -type d -name "spark-notebook*"`
+./bin/spark-notebook
